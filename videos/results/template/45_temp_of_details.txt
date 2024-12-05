@@ -1,0 +1,13 @@
+Input:/Users/coco/2024/hairmodel/videos/template/45_temp.mp4
+Input full path:/Users/coco/2024/hairmodel/videos/template/45_temp.mp4
+Camera parameters:1416.67,1416.67,960,640
+Output HOG:45_temp.hog
+Output video:45_temp.avi
+Output aligned directory:45_temp_aligned
+Output csv:45_temp.csv
+Gaze: 1
+AUs: 1
+Landmarks 2D: 1
+Landmarks 3D: 1
+Pose: 1
+Shape parameters: 1
