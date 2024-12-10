@@ -33,20 +33,6 @@ def showimage(myimage, save_path, figsize=[10, 10]):
     plt.close(fig)
     print(f"Image saved as: {save_path}")
 
-# HSV visualization for orientation and confidence
-def save_hsv_image(orientations, confidence_map, save_path):
-    hue = orientations / np.pi  # Normalize orientations to [0, 1]
-    confidence = (confidence_map - confidence_map.min()) / (confidence_map.max() - confidence_map.min())
-    
-    hsv_image = np.zeros((*orientations.shape, 3), dtype=np.float32)
-    hsv_image[..., 0] = hue  # Hue: orientation
-    hsv_image[..., 1] = 1.0  # Saturation: fixed
-    hsv_image[..., 2] = confidence  # Value: confidence
-    
-    rgb_image = cv2.cvtColor((hsv_image * 255).astype(np.uint8), cv2.COLOR_HSV2RGB)
-    cv2.imwrite(save_path, rgb_image)
-    print(f"HSV image saved as: {save_path}")
-
 # Create Gabor filters
 def createFilter():
     filters = []
