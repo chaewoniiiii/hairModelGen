@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import glob
 import os
 
-# Define a voxel grid which has the 3D locations of each voxel which can then be projected onto each image
 def InitializeVoxels(xlim, ylim, zlim, voxel_size):
     voxels_number = [1, 1, 1]
     voxels_number[0] = np.abs(xlim[1]-xlim[0]) / voxel_size[0]
@@ -60,17 +59,6 @@ def look_at_matrix(camera_position, target_position, up_vector=np.array([0, 0, 1
 
     return rotation_matrix @ translation_matrix
 
-# Orthogonal Projection Matrix
-def orthogonal_projection_matrix():
-    """
-    Generates an orthogonal projection matrix.
-    This removes the depth (Z) component from the 3D points.
-    """
-    return np.array([
-        [1, 0, 0, 0],  # Retain X
-        [0, 1, 0, 0],  # Retain Y
-        [0, 0, 0, 0]   # Ignore Z
-    ])
 
 # Initialize voxels
 voxel_size = [10, 10, 10]
@@ -123,9 +111,6 @@ silhouettes = np.array(silhouettes).transpose(1, 2, 0)
 object_points3D = np.copy(voxels).T
 voxels[:, 3] = 0  # Reset the fourth variable of each voxel
 
-# Orthogonal Projection 적용
-P_ortho = orthogonal_projection_matrix()
-
 proj = []
 for i in range(N):
     # Apply Look-At Transformation
@@ -133,8 +118,7 @@ for i in range(N):
     camera_space_points = np.matmul(M_, object_points3D)
 
     # Apply Orthogonal Projection
-    points2D = np.matmul(P_ortho, camera_space_points)  # Project to 2D
-    points2D = points2D[:2, :]  # Extract x, y
+    points2D = camera_space_points[:2, :]  # Extract x, y
     points2D = np.floor(points2D).astype(np.int32)  # Discretize to pixel space
 
 
@@ -150,19 +134,15 @@ for i in range(N):
 
 
 # Thresholding to filter active voxels
-threshold = 3
+threshold = 6
 filtered_voxels = voxels[voxels[:, 3] >= threshold]
 
 x, y, z = filtered_voxels[:, 0], filtered_voxels[:, 1], filtered_voxels[:, 2]
 
-# 시각화
 fig = plt.figure(figsize=(10, 8))
 ax = fig.add_subplot(111, projection='3d')
-
-# 3D 산점도
 ax.scatter(x, y, z, c=filtered_voxels[:, 3], cmap='viridis', s=2)
 
-# 축 및 제목 설정
 ax.set_title('Filtered Voxels with Overlap >= 3', fontsize=16)
 ax.set_xlabel('X', fontsize=12)
 ax.set_ylabel('Y', fontsize=12)
@@ -170,14 +150,3 @@ ax.set_zlabel('Z', fontsize=12)
 ax.grid(True)
 
 plt.show()
-
-for i in range(N):
-    camera_space_points = np.matmul(M[i], object_points3D)  # Transform to camera space
-    points2D = np.matmul(P_ortho, camera_space_points)  # Orthogonal projection
-    points2D = np.floor(points2D[:2, :]).astype(np.int32)  # 2D coordinates
-
-    # Check alignment with silhouette
-    plt.imshow(silhouettes[:, :, i], cmap='gray')
-    plt.scatter(points2D[0], points2D[1], s=1, c='red')  # Projected points
-    plt.title(f"Camera {i} Projection")
-    plt.show()
